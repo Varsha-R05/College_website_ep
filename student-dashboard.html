@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .summary-table {
+      margin: 40px auto;
+      border-collapse: collapse;
+      width: 80%;
+      text-align: center;
+    }
+    .summary-table th, .summary-table td {
+      border: 1px solid #ccc;
+      padding: 12px;
+    }
+    .summary-table th {
+      background-color: #004e92;
+      color: #fff;
+    }
+    .summary-table td {
+      background-color: #f9f9f9;
+    }
+    .input-section {
+      text-align: center;
+      margin: 20px;
+    }
+    .input-section input, .input-section button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-left"><span class="college-name">Priyadarshini PU College</span></div>
+    <div class="nav-right"><a href="index.html">Logout</a></div>
+  </nav>
+
+  <section class="input-section">
+    <input type="text" id="regNoInput" placeholder="Enter your Registration Number">
+    <button onclick="getSummary()">Show Attendance</button>
+  </section>
+
+  <section class="attendance-summary">
+    <h2 style="text-align:center;">Your Attendance Summary</h2>
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Registration Number</th>
+          <th>Total Days</th>
+          <th>Present Days</th>
+          <th>Attendance Percentage</th>
+        </tr>
+      </thead>
+      <tbody id="summaryBody">
+        <!-- Attendance summary will be populated here -->
+      </tbody>
+    </table>
+  </section>
+
+  <script>
+    function getSummary() {
+      const regNo = document.getElementById("regNoInput").value.trim();
+      if (!regNo) {
+        alert("Please enter your Registration Number");
+        return;
+      }
+
+      fetch(`http://localhost:5000/student-summary/${regNo}`)
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById("summaryBody");
+          tbody.innerHTML = ""; // Clear old data
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${regNo}</td>
+            <td>${data.totalDays}</td>
+            <td>${data.presentDays}</td>
+            <td>${data.attendancePercentage}%</td>
+          `;
+          tbody.appendChild(tr);
+        })
+        .catch(err => console.error(err));
+    }
+  </script>
+</body>
+</html>

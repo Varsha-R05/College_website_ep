@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Dashboard - Attendance</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    nav { background: #004080; color: white; padding: 10px; display: flex; justify-content: space-between; }
+    table { border-collapse: collapse; width: 80%; margin: 20px auto; }
+    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+    .btn { display: block; margin: 20px auto; padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <div>Priyadarshini PU College</div>
+    <div><a href="index.html" style="color:white;">Logout</a></div>
+  </nav>
+
+  <section>
+    <h2 style="text-align:center;">Mark Attendance</h2>
+    <form id="attendanceForm">
+      <table>
+        <thead>
+          <tr>
+            <th>Registration Number</th>
+            <th>Student Name</th>
+            <th>Present</th>
+          </tr>
+        </thead>
+        <tbody id="studentTableBody"></tbody>
+      </table>
+      <button type="submit" class="btn">Submit Attendance</button>
+    </form>
+  </section>
+
+  <script>
+    // Fetch students
+    fetch("http://localhost:5000/students")
+      .then(res => res.json())
+      .then(students => {
+        const tbody = document.getElementById("studentTableBody");
+        tbody.innerHTML = "";
+        students.forEach(student => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${student.regNo}</td>
+            <td>${student.name}</td>
+            <td><input type="checkbox" id="${student._id}" checked></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => console.error(err));
+
+    // Submit attendance
+    document.getElementById("attendanceForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const records = [];
+      document.querySelectorAll("input[type=checkbox]").forEach(cb => {
+        records.push({ studentId: cb.id, present: cb.checked });
+      });
+
+      fetch("http://localhost:5000/attendance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: new Date().toISOString().split('T')[0],
+          records
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.error){
+          alert("Error: " + data.error);
+          return;
+        }
+        let msg = data.message + "\nAbsent students:\n";
+        data.absentStudents.forEach(s => msg += `${s.name} (${s.regNo})\n`);
+        alert(msg);
+      })
+      .catch(err => console.error(err));
+    });
+  </script>
+</body>
+</html>

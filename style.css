@@ -1,0 +1,299 @@
+/* Reset and basic styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background: #f4f4f4;
+  color: #333;
+  position: relative;
+  line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #004e92; /* Solid blue for visibility */
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* stays on top */
+}
+
+.navbar .logo {
+  width: 50px;
+  margin-right: 10px;
+}
+
+.navbar .college-name {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.navbar a {
+  color: #fff;
+  margin-left: 20px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.navbar a:hover {
+  color: #ffcc00;
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  text-align: center;
+  padding: 150px 20px;
+  background: url('college-campus.jpg') no-repeat center center/cover;
+  color: #fff;
+  min-height: 100vh; /* full screen height */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Dark overlay on hero to make text readable */
+.hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* dark overlay */
+  z-index: 0;
+}
+
+
+.hero .hero-content {
+  position: relative;
+  z-index: 1; /* text above overlay */
+}
+
+
+.hero h1 {
+  font-size: 50px;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 22px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  padding: 12px 25px;
+  background: #004e92;
+  color: #fff;
+  border-radius: 6px;
+  transition: 0.3s;
+  margin-top: 15px;
+}
+
+.btn:hover {
+  background: #0061b2;
+}
+
+/* Sections */
+section {
+  padding: 60px 20px;
+}
+
+/* Principal Section */
+.principal {
+  text-align: center;
+  background: #f9f9f9;
+}
+
+.principal h2 {
+  font-size: 32px;
+  margin-bottom: 30px;
+}
+
+.principal-card {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.principal-card img {
+  width: 200px;
+  border-radius: 10px;
+}
+
+.principal-info {
+  max-width: 500px;
+  text-align: left;
+}
+
+/* Staff Section */
+.staff {
+  text-align: center;
+}
+
+.staff h2 {
+  font-size: 32px;
+  margin-bottom: 30px;
+}
+
+.staff-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.staff-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  transition: 0.3s;
+  cursor: pointer;
+  text-align: center;
+}
+
+.staff-card img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.staff-card h4 {
+  margin-bottom: 5px;
+}
+
+.staff-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Contact Section */
+.contact {
+  background: #e6e6e6;
+}
+
+.contact h2 {
+  font-size: 32px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.contact form {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.contact input,
+.contact textarea {
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  width: 100%;
+}
+
+.contact button {
+  padding: 12px;
+  background: #004e92;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.contact button:hover {
+  background: #0061b2;
+}
+
+/* Login Page */
+.login-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: url('college-campus.jpg') no-repeat center center/cover;
+  position: relative;
+}
+
+.login-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+}
+
+.login-box {
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  padding: 40px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+}
+
+.login-box h2 {
+  margin-bottom: 20px;
+}
+
+.input-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.btn {
+  width: 100%;
+  padding: 10px;
+  background: #004e92;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #0061b2;
+}
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
