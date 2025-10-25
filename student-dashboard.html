@@ -1,91 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+
   <style>
-    .summary-table {
-      margin: 40px auto;
+    /* Basic styles */
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Simple top navbar */
+    nav {
+      background: #004080;
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    nav button {
+      background: #ffcc00;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    nav button:hover {
+      background: #e6b800;
+    }
+
+    /* Dashboard heading */
+    h3 {
+      text-align: center;
+      margin-top: 30px;
+      color: #333;
+    }
+
+    /* Attendance table */
+    table {
       border-collapse: collapse;
       width: 80%;
-      text-align: center;
+      margin: 30px auto;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-    .summary-table th, .summary-table td {
-      border: 1px solid #ccc;
+
+    th, td {
       padding: 12px;
-    }
-    .summary-table th {
-      background-color: #004e92;
-      color: #fff;
-    }
-    .summary-table td {
-      background-color: #f9f9f9;
-    }
-    .input-section {
+      border: 1px solid #ddd;
       text-align: center;
-      margin: 20px;
-    }
-    .input-section input, .input-section button {
-      padding: 10px;
       font-size: 16px;
-      margin: 10px;
+    }
+
+    th {
+      background: #004080;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+
+    /* Status colors */
+    .present {
+      color: green;
+      font-weight: bold;
+    }
+
+    .absent {
+      color: red;
+      font-weight: bold;
+    }
+
+    /* Message for no records */
+    #attendanceTable td[colspan] {
+      color: #666;
+      font-style: italic;
     }
   </style>
 </head>
+
 <body>
-  <nav class="navbar">
-    <div class="nav-left"><span class="college-name">Priyadarshini PU College</span></div>
-    <div class="nav-right"><a href="index.html">Logout</a></div>
+
+  <nav>
+    <h2>Student Dashboard</h2>
+    <button id="logoutBtn">Logout</button>
   </nav>
 
-  <section class="input-section">
-    <input type="text" id="regNoInput" placeholder="Enter your Registration Number">
-    <button onclick="getSummary()">Show Attendance</button>
-  </section>
+  <h3>Your Attendance Record</h3>
 
-  <section class="attendance-summary">
-    <h2 style="text-align:center;">Your Attendance Summary</h2>
-    <table class="summary-table">
-      <thead>
-        <tr>
-          <th>Registration Number</th>
-          <th>Total Days</th>
-          <th>Present Days</th>
-          <th>Attendance Percentage</th>
-        </tr>
-      </thead>
-      <tbody id="summaryBody">
-        <!-- Attendance summary will be populated here -->
-      </tbody>
-    </table>
-  </section>
+  <table id="attendanceTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="2">Loading...</td></tr>
+    </tbody>
+  </table>
 
   <script>
-    function getSummary() {
-      const regNo = document.getElementById("regNoInput").value.trim();
-      if (!regNo) {
-        alert("Please enter your Registration Number");
-        return;
-      }
+    const regNo = localStorage.getItem("studentRegNo");
+    if (!regNo) {
+      alert("Please login first!");
+      window.location.href = "login.html";
+    }
 
-      fetch(`http://localhost:5000/student-summary/${regNo}`)
-        .then(res => res.json())
-        .then(data => {
-          const tbody = document.getElementById("summaryBody");
-          tbody.innerHTML = ""; // Clear old data
+    fetch(`http://localhost:5000/student-attendance/${regNo}`)
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.querySelector("#attendanceTable tbody");
+        tbody.innerHTML = "";
+
+        if (!data.attendance || data.attendance.length === 0) {
+          tbody.innerHTML = "<tr><td colspan='2'>No attendance records found</td></tr>";
+          return;
+        }
+
+        data.attendance.forEach(record => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${regNo}</td>
-            <td>${data.totalDays}</td>
-            <td>${data.presentDays}</td>
-            <td>${data.attendancePercentage}%</td>
+            <td>${record.date}</td>
+            <td class="${record.present ? 'present' : 'absent'}">
+              ${record.present ? "Present" : "Absent"}
+            </td>
           `;
           tbody.appendChild(tr);
-        })
-        .catch(err => console.error(err));
-    }
+        });
+      })
+      .catch(err => console.error(err));
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("studentRegNo");
+      window.location.href = "login.html";
+    });
   </script>
+
 </body>
 </html>
