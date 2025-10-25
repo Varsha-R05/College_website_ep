@@ -20,6 +20,7 @@ mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/collegeDB",
 const studentSchema = new mongoose.Schema({
   name: { type: String, required: true },
   regNo: { type: String, required: true, unique: true },
+  password: { type: String, required: true }, // Add this
   parentEmail: { type: String, required: true } // parent email
 });
 
@@ -33,6 +34,14 @@ const attendanceSchema = new mongoose.Schema({
   ]
 });
 
+// ------------------- Teacher Schema -------------------
+const teacherSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true }
+});
+
+const Teacher = mongoose.model("Teacher", teacherSchema);
 const Student = mongoose.model("Student", studentSchema);
 const Attendance = mongoose.model("Attendance", attendanceSchema);
 
@@ -76,6 +85,41 @@ app.post("/students", async (req, res) => {
     }
   }
 });
+
+app.get("/student-attendance/:regNo", async (req, res) => {
+  const { regNo } = req.params;
+  const student = await Student.findOne({ regNo });
+  if (!student) return res.status(404).json({ error: "Student not found" });
+
+  const records = await Attendance.find({ "records.studentId": student._id });
+  const attendanceSummary = records.map(att => {
+    const studentRecord = att.records.find(r => r.studentId.toString() === student._id.toString());
+    return { date: att.date, present: studentRecord.present };
+  });
+
+  res.json({ student: { name: student.name, regNo: student.regNo }, attendance: attendanceSummary });
+});
+
+app.post("/student-login", async (req, res) => {
+  const { regNo, password } = req.body;
+
+  if (!regNo || !password)
+    return res.status(400).json({ error: "RegNo and password are required" });
+
+  try {
+    const student = await Student.findOne({ regNo });
+    if (!student) return res.status(404).json({ error: "Student not found" });
+
+    if (student.password !== password)
+      return res.status(401).json({ error: "Incorrect password" });
+
+    res.json({ message: "Login successful", student });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 
 // Submit or update attendance
 app.post("/attendance", async (req, res) => {
@@ -123,6 +167,59 @@ app.post("/attendance", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// ------------------- TEACHER ROUTES -------------------
+
+// Get all teachers
+app.get("/teachers", async (req, res) => {
+  try {
+    const teachers = await Teacher.find();
+    res.json(teachers);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Add a new teacher
+app.post("/teachers", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password)
+      return res.status(400).json({ error: "All fields are required" });
+
+    const teacher = new Teacher({ name, email, password });
+    await teacher.save();
+    res.json({ message: "Teacher added successfully", teacher });
+  } catch (err) {
+    if (err.code === 11000) {
+      res.status(400).json({ error: "Teacher with this email already exists" });
+    } else {
+      res.status(500).json({ error: err.message });
+    }
+  }
+});
+
+// Teacher login
+app.post("/teacher-login", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password)
+    return res.status(400).json({ error: "Email and password are required" });
+
+  try {
+    const teacher = await Teacher.findOne({ email });
+    if (!teacher) return res.status(404).json({ error: "Teacher not found" });
+
+    if (teacher.password !== password)
+      return res.status(401).json({ error: "Incorrect password" });
+
+    res.json({ message: "Login successful", teacher });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 
 // ------------------- Start Server -------------------
 const PORT = process.env.PORT || 5000;
